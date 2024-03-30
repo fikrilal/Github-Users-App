@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">GithubUserApps</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="text_searchbar">Cari Pengguna</string>
+    <string name="text_avatar">Photo Profile</string>
+    <string name="github_user">Github User</string>
+    <string name="cari_pengguna">Cari pengguna..</string>
+    <string name="followers">Followers</string>
+    <string name="memuat_nama">Memuat Nama</string>
+    <string name="memuat_username">Memuat Username</string>
+    <string name="memuat_follower">Memuat follower</string>
+    <string name="following">Following</string>
+    <string name="follower">follower</string>
+</resources>
