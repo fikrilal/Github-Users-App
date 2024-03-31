@@ -12,4 +12,9 @@
     <string name="memuat_follower">Memuat follower</string>
     <string name="following">Following</string>
     <string name="follower">follower</string>
+    <string name="pengguna_favorit">Pengguna Favorit</string>
+    <string name="back">Back</string>
+    <string name="bookmark">Bookmark</string>
+    <string name="swithc_theme">Switch Theme</string>
+    <string name="settings">Settings</string>
 </resources>

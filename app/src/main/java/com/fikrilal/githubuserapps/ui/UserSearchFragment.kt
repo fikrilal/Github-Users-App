@@ -10,30 +10,39 @@ import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fikrilal.githubuserapps.R
 import com.fikrilal.githubuserapps.data.adapter.UsersAdapter
 import com.fikrilal.githubuserapps.data.response.ItemsItem
 import com.fikrilal.githubuserapps.databinding.FragmentUserSearchBinding
 import com.fikrilal.githubuserapps.ui.decoration.SpacesItemDecoration
+import com.fikrilal.githubuserapps.util.SettingsPref
+import com.fikrilal.githubuserapps.util.dataStore
 import com.fikrilal.githubuserapps.viewModel.UserSearchViewModel
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 class UserSearchFragment : Fragment() {
     private val viewModel: UserSearchViewModel by viewModels()
     private var _binding: FragmentUserSearchBinding? = null
     private val binding get() = _binding!!
+    private val settings: SettingsPref by lazy {
+        SettingsPref.getInstance(requireContext().dataStore)
+    }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        Log.d("UserSearchFragment", "onCreateView: Inflating layout")
         _binding = FragmentUserSearchBinding.inflate(inflater, container, false)
+        switchTheme()
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d("UserSearchFragment", "onViewCreated: View created")
         initUI()
     }
 
@@ -43,6 +52,13 @@ class UserSearchFragment : Fragment() {
         setupRecyclerView()
         setupSearchView()
         observeViewModel()
+        binding.favoritedButton.setOnClickListener {
+            Log.d("UserSearchFragment", "Navigating to UserFavoriteFragment")
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.id_container, UserFavoriteFragment())
+                .addToBackStack(null)
+                .commit()
+        }
     }
 
     private fun setupRecyclerView() {
@@ -52,15 +68,10 @@ class UserSearchFragment : Fragment() {
             adapter = UsersAdapter(emptyList()) { username ->
                 navigateToUserDetail(username)
             }
-            val spaceInPixels = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                2f,
-                resources.displayMetrics
-            ).toInt()
+            val spaceInPixels = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2f, resources.displayMetrics).toInt()
             addItemDecoration(SpacesItemDecoration(spaceInPixels))
         }
     }
-
 
     private fun navigateToUserDetail(username: String) {
         Log.d("UserSearchFragment", "Navigating to UserDetailsFragment with username: $username")
@@ -71,7 +82,7 @@ class UserSearchFragment : Fragment() {
         }
         parentFragmentManager.beginTransaction().apply {
             replace(R.id.id_container, detailFragment)
-            addToBackStack(null) // Optional, for adding the transaction to the back stack
+            addToBackStack(null)
             commit()
         }
     }
@@ -82,9 +93,11 @@ class UserSearchFragment : Fragment() {
             setupWithSearchBar(binding.idSearchBar)
             editText.setOnEditorActionListener { _, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    editText.text.toString().takeIf { it.isNotEmpty() }?.let { searchQuery ->
+                    val searchQuery = editText.text.toString()
+                    if (searchQuery.isNotEmpty()) {
+                        Log.d("UserSearchFragment", "Search initiated for query: $searchQuery")
                         viewModel.userSearch(searchQuery)
-                        binding.idSearchBar.setText(text)
+                        binding.idSearchBar.setText(searchQuery)
                         hide()
                     }
                     true
@@ -104,6 +117,7 @@ class UserSearchFragment : Fragment() {
         })
         viewModel.snackbarMessageLiveData.observe(viewLifecycleOwner) { event ->
             event.getContentIfNotHandled()?.let { snackBarText ->
+                Log.d("UserSearchFragment", "Showing Snackbar message")
                 Snackbar.make(requireView().rootView, snackBarText, Snackbar.LENGTH_SHORT).show()
             }
         }
@@ -121,6 +135,22 @@ class UserSearchFragment : Fragment() {
         super.onDestroyView()
         _binding = null
         Log.d("UserSearchFragment", "onDestroyView: View binding cleared")
+    }
+
+    private fun switchTheme() {
+        Log.d("UserSearchFragment", "Switching theme")
+        settings.getThemeSetting().asLiveData().observe(viewLifecycleOwner) { isModeIrengActive ->
+            binding.switchButton.tag = if (isModeIrengActive) "iconDarkMode" else "iconLightMode"
+            val iconSwitch = if (isModeIrengActive) R.drawable.sun else R.drawable.moon
+            binding.switchButton.setImageResource(iconSwitch)
+        }
+        binding.switchButton.setOnClickListener{
+            Log.d("UserSearchFragment", "Toggling theme mode")
+            lifecycleScope.launch {
+                val currentMode = settings.getThemeSetting().first()
+                settings.simpanTheme(!currentMode)
+            }
+        }
     }
 
     companion object {

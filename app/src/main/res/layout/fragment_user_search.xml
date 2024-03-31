@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.UserSearchFragment">
+    tools:context=".ui.UserSearchFragment"
+    android:theme="@style/Theme.GithubUserApps">
 
     <TextView
         android:id="@+id/id_tv_app_title"
@@ -14,16 +15,45 @@
         android:layout_marginTop="32dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textStyle="bold"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginStart="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/switchButton"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        android:textColor="?attr/colorOnSurface"/>
+
+    <!-- Settings Button -->
+    <ImageButton
+        android:id="@+id/favoritedButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/heart_filled"
+        android:contentDescription="@string/settings"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/id_tv_app_title"
+        android:layout_marginEnd="16dp"
+        app:tint="?attr/colorOnSurface"/>
+
+    <!-- Bookmark Button -->
+    <ImageButton
+        android:id="@+id/switchButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/moon"
+        android:contentDescription="@string/swithc_theme"
+        app:layout_constraintEnd_toStartOf="@id/favoritedButton"
+        app:layout_constraintTop_toTopOf="@+id/id_tv_app_title"
+        android:layout_marginEnd="8dp"
+        app:tint="?attr/colorOnSurface"/>
 
     <com.google.android.material.search.SearchBar
         android:id="@+id/id_search_bar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="@string/cari_pengguna"
+        android:layout_marginTop="32dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/id_tv_app_title">
